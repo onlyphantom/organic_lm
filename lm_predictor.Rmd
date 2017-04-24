@@ -1,0 +1,68 @@
+---
+title: "Predicting organic installs multiplier"
+author: "Samuel Chan"
+date: "24 April 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+This exercise is motivated by a request from an industry friend, who is interested to learn the **organic multiplier** rate for mobile app campaigns in the Shopping category in an unspecified geo / country. 
+
+*Some initialization and configuration*
+```{r}
+# clear our global environment
+rm(list=ls())
+
+# effectively prevent scientific notation e.g e+04
+options(scipen = 999)
+```
+
+### Read in the data and simple exploratory
+```{r}
+# Read in the data
+data <- read.csv("data2.csv", header=TRUE)
+
+# Feature construction
+data$total <- data$paid + data$organic
+
+# Examine if there is a fairly linear relationship between paid and organic
+library(ggplot2)
+ggplot(data = data, aes(x=paid, y=organic))+geom_point()+labs(x="Paid installs", y="Organic Installs", main="Paid vs Organic installs")+geom_smooth(method=lm)
+```
+Notice our use of `method=lm` automatically assume a 95% confidence region
+
+
+### Fit our first linear regression line
+```{r}
+fit <- lm(organic ~ paid, data = data)
+summary(fit)
+```
+Interpreting the outlut: Values of coefficients are 1072240 and 1.462, hence prediction equation for model using the provided dataset is as below:
+**Organic installs = 1072240 + 1.462 * paid installs**
+
+We also observed that our _cost_ is 933400 (residual standard error)
+
+# Compare organic installs predicted by the linear regression model vs actual values
+```{r}
+actual.o <- data$organic
+pred.o <- fitted(fit)
+comparison <- as.data.frame(cbind("Actual Organic"=actual.o, "Predicted Organic" = pred.o, "Difference (%)" = round(sqrt((actual.o-pred.o)^2)/actual.o*100, 2)))
+comparison[1:25,]
+```
+Our formula here: **Organic installs = 1072240 + 1.462 * paid installs** can quite reliably predict the organic installs of many days with roughly 2% to 8% of error (difference). Depending on your use-case, this may or may not be a sufficient predictive model. There were 2 days of outlier (21st March and 22nd March respectively), but those are likely the result of extra boost campaign unaccounted in the data -- or possibly an Apple AppStore feature or Google Play feature.
+
+
+### Final words
+It is important to note here that the dependent variable (organic installs / multiplier) is correlated with the independent variable (paid installs) but this correlation do not imply causation. That is, as the number of paid installs changes, we observe a change in the organic installs. This should not be inferred or interpreted to mean that the paid installs has _caused_ the number of organic installs to change.
+
+However, we should also note that the model has a multiple R-squared value of *0.4791*. An easy way to intepret this is that the linear model as a whole explains nearly 48% of the variation in our dependenable variable. We have after all, fit a simple linear model and this exercise should in no way be considered robust or scientifically rigorous. To improve our model's performance, we could:
+
+- Obtain larger datasets  
+- Construct multiple features on each observation (app's placement on top free download rankings, top free shopping rankings)
+- Variability (datasets spanning across multiple months)  
+
+
+
+
+
