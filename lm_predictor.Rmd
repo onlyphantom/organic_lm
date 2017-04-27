@@ -52,17 +52,27 @@ comparison[1:25,]
 ```
 Our formula here: **Organic installs = 1072240 + 1.462 * paid installs** can quite reliably predict the organic installs of many days with roughly 2% to 8% of error (difference). Depending on your use-case, this may or may not be a sufficient predictive model. There were 2 days of outlier (21st March and 22nd March respectively), but those are likely the result of extra boost campaign unaccounted in the data -- or possibly an Apple AppStore feature or Google Play feature.
 
+### If we have removed the outlying 21st and 22nd March's data
+```{r}
+data2 <- data[-c(21,22),]
+fit2 <- lm(organic ~ paid, data = data2)
+summary(fit2)
+```
+We would achieve a multiple R-squared value of ~0.7.
 
-### Final words
+
+### Caveat
 It is important to note here that the dependent variable (organic installs / multiplier) is correlated with the independent variable (paid installs) but this correlation do not imply causation. That is, as the number of paid installs changes, we observe a change in the organic installs. This should not be inferred or interpreted to mean that the paid installs has _caused_ the number of organic installs to change.
 
-However, we should also note that the model has a multiple R-squared value of *0.4791*. An easy way to intepret this is that the linear model as a whole explains nearly 48% of the variation in our dependenable variable. We have after all, fit a simple linear model and this exercise should in no way be considered robust or scientifically rigorous. To improve our model's performance, we could:
+However, we should also note that the model has a multiple R-squared value of *0.6956*. An easy way to intepret this is that the linear model as a whole explains nearly 70% of the variation in our dependenable variable. We have after all, fit a simple linear model and this exercise should in no way be considered robust or scientifically rigorous. To improve our model's performance, we could:
 
 - Obtain larger datasets  
 - Construct multiple features on each observation (app's placement on top free download rankings, top free shopping rankings)
 - Variability (datasets spanning across multiple months)  
 
+We should also acknowledge that a game or mobile app's inherent design, including its virality features, social features, in-game social gifting features etc might also a role in the organic multiplier. Obtaining bigger sample sizes or more data could help in our hypothesis design. 
 
+Despite its simplicity, we also observe that a linear model is powerful enough as a predictor for organic multiplier on the provided data, and has the added advantage of being effective despite the relatively small sample size. 
 
 
 
