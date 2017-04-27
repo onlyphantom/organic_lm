@@ -166,7 +166,7 @@ summary(fit)</code></pre>
 ## Residual standard error: 933400 on 23 degrees of freedom
 ## Multiple R-squared:  0.4791, Adjusted R-squared:  0.4564 
 ## F-statistic: 21.15 on 1 and 23 DF,  p-value: 0.0001264</code></pre>
-<p>Interpreting the outlut: Values of coefficients(θs) are 1072240 and 1.462, hence prediction equation for model using the provided dataset is as below: <strong>Organic installs = 1072240 + 1.462 * paid installs</strong></p>
+<p>Interpreting the outlut: Values of coefficients are 1072240 and 1.462, hence prediction equation for model using the provided dataset is as below: <strong>Organic installs = 1072240 + 1.462 * paid installs</strong></p>
 <p>We also observed that our <em>cost</em> is 933400 (residual standard error)</p>
 </div>
 <div id="compare-organic-installs-predicted-by-the-linear-regression-model-vs-actual-values" class="section level1">
@@ -202,16 +202,43 @@ comparison[1:25,]</code></pre>
 ## 24       16467219          16361509           0.64
 ## 25       18349397          17485431           4.71</code></pre>
 <p>Our formula here: <strong>Organic installs = 1072240 + 1.462 * paid installs</strong> can quite reliably predict the organic installs of many days with roughly 2% to 8% of error (difference). Depending on your use-case, this may or may not be a sufficient predictive model. There were 2 days of outlier (21st March and 22nd March respectively), but those are likely the result of extra boost campaign unaccounted in the data – or possibly an Apple AppStore feature or Google Play feature.</p>
-<div id="final-words" class="section level3">
-<h3>Final words</h3>
+<div id="if-we-have-removed-the-outlying-21st-and-22nd-marchs-data" class="section level3">
+<h3>If we have removed the outlying 21st and 22nd March’s data</h3>
+<pre class="r"><code>data2 &lt;- data[-c(21,22),]
+fit2 &lt;- lm(organic ~ paid, data = data2)
+summary(fit2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = organic ~ paid, data = data2)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1600686  -296598    59908   350119  1199575 
+## 
+## Coefficients:
+##                  Estimate    Std. Error t value    Pr(&gt;|t|)    
+## (Intercept) -2390008.4073  2581170.1819  -0.926       0.365    
+## paid               1.8211        0.2543   7.161 0.000000464 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 706500 on 21 degrees of freedom
+## Multiple R-squared:  0.7094, Adjusted R-squared:  0.6956 
+## F-statistic: 51.27 on 1 and 21 DF,  p-value: 0.0000004642</code></pre>
+<p>We would achieve a multiple R-squared value of ~0.7.</p>
+</div>
+<div id="caveat" class="section level3">
+<h3>Caveat</h3>
 <p>It is important to note here that the dependent variable (organic installs / multiplier) is correlated with the independent variable (paid installs) but this correlation do not imply causation. That is, as the number of paid installs changes, we observe a change in the organic installs. This should not be inferred or interpreted to mean that the paid installs has <em>caused</em> the number of organic installs to change.</p>
-<p>However, we should also note that the model has a multiple R-squared value of <em>0.4791</em>. An easy way to intepret this is that the linear model as a whole explains nearly 48% of the variation in our dependenable variable. We have after all, fit a simple linear model and this exercise should in no way be considered robust or scientifically rigorous. To improve our model’s performance, we could:</p>
+<p>However, we should also note that the model has a multiple R-squared value of <em>0.6956</em>. An easy way to intepret this is that the linear model as a whole explains nearly 70% of the variation in our dependenable variable. We have after all, fit a simple linear model and this exercise should in no way be considered robust or scientifically rigorous. To improve our model’s performance, we could:</p>
 <ul>
 <li>Obtain larger datasets<br />
 </li>
 <li>Construct multiple features on each observation (app’s placement on top free download rankings, top free shopping rankings)</li>
 <li>Variability (datasets spanning across multiple months)</li>
 </ul>
+<p>We should also acknowledge that a game or mobile app’s inherent design, including its virality features, social features, in-game social gifting features etc might also a role in the organic multiplier. Obtaining bigger sample sizes or more data could help in our hypothesis design.</p>
+<p>Despite its simplicity, we also observe that a linear model is powerful enough as a predictor for organic multiplier on the provided data, and has the added advantage of being effective despite the relatively small sample size.</p>
 </div>
 </div>
 
